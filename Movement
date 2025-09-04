@@ -1,0 +1,286 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+public class Movement : MonoBehaviour
+{
+    private Animator WModel;
+    public float setx,sety = 0;
+    public int MyScore = 0;
+    public Text ShowingScore;
+
+    public GameObject Heart1, Heart2, Heart3;
+    int RemainHP = 3;
+
+    public GameObject bullet;
+    public Transform spawnPoint;
+    public float shootSpeed = 20;
+
+    public AudioSource audioData;
+
+    void Start()
+    {
+        WModel = GetComponent<Animator>();
+    }
+
+    IEnumerator waiter()
+    {
+        yield return new WaitForSeconds(0.5f);
+        FireBullet();
+    }
+
+    void Update()
+    {
+        //Jump
+        GetComponent<Rigidbody>().velocity = new Vector3(setx, sety);
+
+        if (Input.GetKeyDown("space"))
+        {
+            sety = 10;
+        }
+        if (Input.GetKeyUp("space"))
+        {
+            sety = -6;
+        }
+       
+
+        //Walk
+        if (Input.GetKeyDown("right"))
+        {
+            setx = 8;
+            WModel.SetFloat(name: "SetMove", 1);
+            GetComponent<Rigidbody>().velocity = new Vector3(setx, sety);
+            var lockpos = GetComponent<Rigidbody>().velocity;
+            lockpos.y = 0;
+            transform.rotation = Quaternion.LookRotation(lockpos);
+        }
+        if (Input.GetKeyUp("right"))
+        {
+            WModel.SetFloat(name: "SetMove", 0);
+            setx = 0;
+        }
+        if (Input.GetKeyDown("d"))
+        {
+            setx = 8;
+            WModel.SetFloat(name: "SetMove", 1);
+            GetComponent<Rigidbody>().velocity = new Vector3(setx, sety);
+            var lockpos = GetComponent<Rigidbody>().velocity;
+            lockpos.y = 0;
+            transform.rotation = Quaternion.LookRotation(lockpos);
+        }
+        if (Input.GetKeyUp("d"))
+        {
+            WModel.SetFloat(name: "SetMove", 0);
+            setx = 0;
+        }
+
+        if (Input.GetKeyDown("left"))
+        {
+            setx = -8;
+            WModel.SetFloat(name: "SetMove", 1);
+            GetComponent<Rigidbody>().velocity = new Vector3(setx, sety);
+            var lockpos = GetComponent<Rigidbody>().velocity;
+            lockpos.y = 0;
+            transform.rotation = Quaternion.LookRotation(lockpos);
+        }
+        if (Input.GetKeyUp("left"))
+        {
+            WModel.SetFloat(name: "SetMove", 0);
+            setx = 0;
+        }
+        if (Input.GetKeyDown("a"))
+        {
+            setx = -8;
+            WModel.SetFloat(name: "SetMove", 1);
+            GetComponent<Rigidbody>().velocity = new Vector3(setx, sety);
+            var lockpos = GetComponent<Rigidbody>().velocity;
+            lockpos.y = 0;
+            transform.rotation = Quaternion.LookRotation(lockpos);
+        }
+        if (Input.GetKeyUp("a"))
+        {
+            WModel.SetFloat(name: "SetMove", 0);
+            setx = 0;
+        }
+
+        if (Input.GetKeyDown("e"))
+        {
+            WModel.SetFloat(name: "SetAttack", 1);
+            StartCoroutine(waiter());
+            audioData.Play(0);
+        }
+        if (Input.GetKeyUp("e"))
+        {
+            WModel.SetFloat(name: "SetAttack", 0);
+        }
+    }
+
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Coin+Score")
+        {
+            Destroy(other.gameObject);
+            MyScore = MyScore + 100;
+            ShowingScore.text = MyScore.ToString();
+        }
+        if (other.gameObject.tag == "Coin+Score2")
+        {
+            Destroy(other.gameObject);
+            MyScore = MyScore + 500;
+            ShowingScore.text = MyScore.ToString();
+        }
+
+        if (other.gameObject.tag == "Coin-Score")
+        {
+            Destroy(other.gameObject);
+            MyScore = MyScore - 300;
+            if (MyScore <= 0)
+            {
+                MyScore = 0;
+            }
+
+            ShowingScore.text = MyScore.ToString();
+        }
+        if (other.gameObject.tag == "Coin-Score2")
+        {
+            Destroy(other.gameObject);
+            MyScore = MyScore - 500;
+            if (MyScore <= 0)
+            {
+                MyScore = 0;
+                if (RemainHP == 3)
+                {
+                    Heart3.SetActive(false);
+                    RemainHP = RemainHP - 1;
+                }
+                else if (RemainHP == 2)
+                {
+                    Heart2.SetActive(false);
+                    RemainHP = RemainHP - 1;
+                }
+                else if (RemainHP == 1)
+                {
+                    SceneManager.LoadScene("GameOver");
+                }
+            }
+
+            ShowingScore.text = MyScore.ToString();
+        }
+
+        if (other.gameObject.tag == "Death")
+        {
+            SceneManager.LoadScene("GameOver");
+        }
+        if (other.gameObject.tag == "Victory")
+        {
+            SceneManager.LoadScene("YouWin");
+        }
+
+        //Monster
+        if (other.gameObject.tag == "HP-Monster")
+        {
+            if (RemainHP == 1)
+            {
+                SceneManager.LoadScene("GameOver");
+            }
+            else if (RemainHP == 2)
+            {
+                Heart2.SetActive(false);
+                RemainHP = RemainHP - 1;
+            }
+            else if (RemainHP == 3)
+            {
+                Heart3.SetActive(false);
+                RemainHP = RemainHP - 1;
+            }
+
+            MyScore = MyScore - 50;
+            if (MyScore <= 0)
+            {
+                MyScore = 0;
+            }
+            ShowingScore.text = MyScore.ToString();
+        }
+    }
+
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if(collision.gameObject.tag == "HP-Trap")
+        {
+            if(RemainHP == 3)
+            {
+                Heart3.SetActive(false);
+                RemainHP = RemainHP - 1;
+            }
+            else if(RemainHP == 2)
+            {
+                Heart2.SetActive(false);
+                RemainHP = RemainHP - 1;
+            }
+            else if(RemainHP == 1)
+            {
+                    SceneManager.LoadScene("GameOver");
+            }
+            Destroy(collision.gameObject);
+        }
+
+        if (collision.gameObject.tag == "HP+Potion")
+        {
+            if (RemainHP == 3)
+            {
+                RemainHP = 3;
+            }
+            else if (RemainHP == 2)
+            {
+                RemainHP = RemainHP + 1;
+                Heart3.SetActive(true);
+            }
+            else if (RemainHP == 1)
+            {
+                RemainHP = RemainHP + 1;
+                Heart2.SetActive(true);
+            }
+            Destroy(collision.gameObject);
+        }
+
+        //Monster
+        if (collision.gameObject.tag == "HP-Monster")
+        {
+            if (RemainHP == 1)
+            {
+                SceneManager.LoadScene("GameOver");
+            }
+            else if (RemainHP == 2)
+            {
+                Heart2.SetActive(false);
+                RemainHP = RemainHP - 1;
+            }
+            else if (RemainHP == 3)
+            {
+                Heart3.SetActive(false);
+                RemainHP = RemainHP - 1;
+            }
+            //StateControler.RemainHP = RemainHP;
+
+            MyScore = MyScore - 50;
+            if (MyScore <= 0)
+            {
+                MyScore = 0;
+            }
+            ShowingScore.text = MyScore.ToString();
+        }
+    }
+
+    public void FireBullet()
+    {
+        GameObject spawnbullet = Instantiate(bullet);
+        spawnbullet.transform.position = spawnPoint.position;
+        spawnbullet.GetComponent<Rigidbody>().velocity = spawnPoint.forward * shootSpeed;
+        Destroy(spawnbullet, 5);
+
+    }
+}
