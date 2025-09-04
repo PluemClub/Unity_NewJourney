@@ -1,0 +1,36 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class SceneLoader : MonoBehaviour
+{
+    public void StartToSelectLevel()
+    {
+        SceneManager.LoadScene("SelectLevel");
+    }
+    public void StartToCredit()
+    {
+        SceneManager.LoadScene("Credit");
+    }
+    public void CreditBackToStart()
+    {
+        SceneManager.LoadScene("HomePage");
+    }
+    public void SelectLevelToStart()
+    {
+        SceneManager.LoadScene("Homepage");
+    }
+    public void SelectLevelToGame()
+    {
+        SceneManager.LoadScene("TheGame");
+    }
+    public void TheGameLost()
+    {
+        SceneManager.LoadScene("HomePage");
+    }
+    public void MenuStartGame()
+    {
+        SceneManager.LoadScene("SceneSelect");
+    }
+}
